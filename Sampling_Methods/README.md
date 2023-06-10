@@ -1,1 +1,1 @@
-### * Box-Muller Method
+* Box-Muller Method
