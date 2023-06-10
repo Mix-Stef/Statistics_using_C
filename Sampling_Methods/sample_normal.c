@@ -10,8 +10,7 @@
 int main(int argc, char *argv[]){
 
     double pi = 3.1415;
-    //RNG
-    srand(time(NULL));
+    srand(time(NULL)); //RNG
     int N = atoi(argv[1]); //Number of points
     FILE *fp;
     fp = fopen("random_normal.csv", "w");
@@ -21,15 +20,15 @@ int main(int argc, char *argv[]){
     }
     fprintf(fp, "x,y\n");
     for (int i=0;i<N;i++){
-        double u1 = (rand() % 1000) / (double)1000;
-        double u2 = (rand() % 1000) / (double)1000;
-        float z1 = sqrt(-2.0 * log(u1)) * cos(2.0 * pi * u2);
-        float z2 = sqrt(-2.0 * log(u1)) * sin(2.0 * pi * u2);
+        double u1 = (rand() % 1000) / (double)1000; //Random uniform in (0,1)
+        double u2 = (rand() % 1000) / (double)1000; //Random uniform in (0,1)
+        double z1 = sqrt(-2.0 * log(u1)) * cos(2.0 * pi * u2); //Box-Muller Transform
+        double z2 = sqrt(-2.0 * log(u1)) * sin(2.0 * pi * u2); //Box-Muller Transform
         // printf("%f %f \n", z1, z2);
-        fprintf(fp, "%f,%f\n", z1, z2);
+        if (isinf(z1) == 0 && isinf(z2) == 0){ //May produce infinities due to numerical instability so we discard them
+            fprintf(fp, "%f,%f\n", z1, z2);
+        }
     }
-
-
     fclose(fp);
     return 0;
 }
