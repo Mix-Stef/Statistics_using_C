@@ -7,6 +7,8 @@ double column_sum(int col, FILE *fp, char *delim);
 double column_mean(int col, FILE *fp, char *delim);
 double column_variance(int col, FILE *fp, char *delim);
 int number_of_columns(FILE *fp, char *delim);
+double column_max(int col, FILE *fp, char *delim);
+double column_min(int col, FILE *fp, char *delim);
 
 int main(){
 
@@ -22,11 +24,15 @@ int main(){
 	double m = column_mean(0, fp, delim);
 	double v = column_variance(0, fp, delim);
 	double std = sqrt(v);
+	double M = column_max(0, fp, delim);
+	double min = column_min(0, fp, delim);
 	printf("Number of columns: %d\n", c);
 	printf("Sum of first column: %f\n", s);
 	printf("Mean of first column: %f\n", m);
 	printf("Variance of first column: %f\n", v);
 	printf("Std of first column: %f \n", std);
+	printf("Column max: %f \n", M);
+	printf("Column minimum: %f \n", min);
 
 	fclose(fp);
 	return 0;
@@ -138,3 +144,59 @@ double column_variance(int col, FILE *fp, char *delim){
 	var = var / count;
 	return var;
 }
+
+
+//Functions to get the minimum and maximum of a column
+double column_max(int col, FILE *fp, char *delim){
+	rewind(fp); //Just for safety
+	int count = 0;
+	double maximum = -INFINITY;
+	int number_of_cols = number_of_columns(fp, delim);
+	char buffer[128];
+	while (fgets(buffer, 128, fp)){
+		char *tokens = strtok(buffer, delim);
+		char *eptr;
+		int col_counter = 0;
+		while (tokens != NULL){
+			if (col_counter % number_of_cols == col){
+				double x_value = strtod(tokens, &eptr);
+				if (x_value > maximum){
+					maximum = x_value;
+				}
+				}
+			tokens = strtok(NULL, delim);
+			col_counter++;
+			}
+		}
+	return maximum;
+}
+
+double column_min(int col, FILE *fp, char *delim){
+	rewind(fp); //Just for safety
+	int count = 0;
+	double minimum = INFINITY;
+	int number_of_cols = number_of_columns(fp, delim);
+	char buffer[128];
+	while (fgets(buffer, 128, fp)){
+		char *tokens = strtok(buffer, delim);
+		char *eptr;
+		int col_counter = 0;
+		while (tokens != NULL){
+			if (col_counter % number_of_cols == col){
+				double x_value = strtod(tokens, &eptr);
+				if (x_value < minimum){
+					minimum = x_value;
+				}
+				}
+			tokens = strtok(NULL, delim);
+			col_counter++;
+			}
+		}
+	return minimum;
+}
+
+
+
+
+
+
