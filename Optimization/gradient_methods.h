@@ -13,6 +13,10 @@ void gradient_descent(double (*f)(double, double), double *x_init);
 void gradient_descent(double (*objective)(double, double), double *x_init){
 
     double *grad;
+    if (!grad){
+        printf("Memory error!");
+        exit(0);
+    }
     grad =  gradient(objective, x_init[0], x_init[1]);
     double grad_norm = norm(grad, DIMENSIONS);
     while (grad_norm > TOLERANCE){
