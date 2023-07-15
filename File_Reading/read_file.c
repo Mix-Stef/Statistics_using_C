@@ -7,8 +7,10 @@ double column_sum(int col, FILE *fp, char *delim);
 double column_mean(int col, FILE *fp, char *delim);
 double column_variance(int col, FILE *fp, char *delim);
 int number_of_columns(FILE *fp, char *delim);
+int number_of_rows(FILE *fp, char *delim);
 double column_max(int col, FILE *fp, char *delim);
 double column_min(int col, FILE *fp, char *delim);
+
 
 int main(){
 
@@ -19,6 +21,7 @@ int main(){
 		exit(0);
 	}
 	char *delim = ",";
+	int len = number_of_rows(fp, delim);
 	int c = number_of_columns(fp, delim);
 	double s = column_sum(0, fp, delim);
 	double m = column_mean(0, fp, delim);
@@ -27,6 +30,7 @@ int main(){
 	double M = column_max(0, fp, delim);
 	double min = column_min(0, fp, delim);
 	printf("Number of columns: %d\n", c);
+	printf("Number of rows: %d\n", len);
 	printf("Sum of first column: %f\n", s);
 	printf("Mean of first column: %f\n", m);
 	printf("Variance of first column: %f\n", v);
@@ -66,6 +70,15 @@ int number_of_columns(FILE *fp, char *delim){
 	return cols;
 }
 
+int number_of_rows(FILE *fp, char *delim){
+	rewind(fp);
+	int rows = 0;
+	char buffer[128];
+	while (fgets(buffer, 128, fp) != NULL){
+		rows++;
+	}
+	return rows - 1; //Subtract the header
+}
 
 //Function to get the sum of a column
 double column_sum(int col, FILE *fp, char *delim){
@@ -194,9 +207,3 @@ double column_min(int col, FILE *fp, char *delim){
 		}
 	return minimum;
 }
-
-
-
-
-
-
