@@ -14,6 +14,10 @@ int main(int argc, char *argv[]){
 
     double x_init[DIMENSIONS] = {2, 3}; //Initial guess
     double *grad;
+    if (!grad){
+        printf("Memory Error!");
+        exit(0);
+    }
     grad =  gradient(objective, x_init[0], x_init[1]);
     double grad_norm = norm(grad, DIMENSIONS);
     while (grad_norm > TOLERANCE){
