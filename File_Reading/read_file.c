@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "hash_table.h"
 
 double column_sum(int col, FILE *fp, char *delim);
 double column_mean(int col, FILE *fp, char *delim);
@@ -10,10 +11,25 @@ int number_of_columns(FILE *fp, char *delim);
 int number_of_rows(FILE *fp, char *delim);
 double column_max(int col, FILE *fp, char *delim);
 double column_min(int col, FILE *fp, char *delim);
+int number_of_categories(int col, FILE* fp, char* delim);
+void number_of_occurencies(int col, FILE* fp, char* delim);
+
+struct _hashmap{
+    struct _node** array;
+    int m;
+    int size;
+    hash_function h;
+};
+
+struct _node{
+    key k;
+    value v;
+    struct _node* next;
+};
 
 
 int main(){
-
+	printf("Testing calculating statistical quantities with random_normal.csv...\n");
 	FILE *fp;
 	fp = fopen("random_normal.csv", "r");
 	if (fp == NULL){
@@ -37,8 +53,21 @@ int main(){
 	printf("Std of first column: %f \n", std);
 	printf("Column max: %f \n", M);
 	printf("Column minimum: %f \n", min);
-
 	fclose(fp);
+
+	
+	printf("Testing calculating the frequency of categorical variables using test_file.csv
+		and hash_table.c...\n");
+	FILE *fp;
+	fp = fopen("test_file.csv", "r");
+	if (fp == NULL){
+		printf("Cannot open file.\n");
+		exit(0);
+	}
+	printf("Number of categories: %d\n", number_of_categories(1, fp, delim);
+	number_of_occurencies(1, fp, delim);
+	fclose(fp);
+	
 	return 0;
 }
 
@@ -206,4 +235,66 @@ double column_min(int col, FILE *fp, char *delim){
 			}
 		}
 	return minimum;
+}
+
+
+// Count number of occurencies for a categorical variable
+void number_of_occurencies(int col, FILE* fp, char* delim){
+	rewind(fp);
+	hashmap map = hashmap_create(50);
+	int cols = number_of_columns(fp, delim);
+	char buffer[128];
+	while (fgets(buffer, 128, fp)){ // go through rows
+		char *tokens = strtok(buffer, delim);
+		char *eptr;
+		int col_counter = 0;
+		while (tokens != NULL){ // go through columns
+			if (col_counter % cols == col){
+				if (hashmap_contains(map, tokens) == 1){
+					int pos = map->h(tokens) % map->m;
+					map->array[pos]->v++;
+				} else {
+					hashmap_put(map, tokens, 1);
+				}
+				}
+			tokens = strtok(NULL, delim);
+			col_counter++;
+			}
+		}
+	for (int i=0;i<map->m;i++){
+		if (map->array[i] != NULL){
+			printf("Category: %s occurs %d times.\n", map->array[i]->k, hashmap_get(map, map->array[i]->k));
+		}
+	}
+	hashmap_destroy(map);
+}
+
+
+
+//Essentially count_unique
+int number_of_categories(int col, FILE* fp, char* delim){
+	rewind(fp);
+	int categories = 0;
+	hashmap map = hashmap_create(50);
+	int cols = number_of_columns(fp, delim);
+	char buffer[128];
+	while (fgets(buffer, 128, fp)){ // go through rows
+		char *tokens = strtok(buffer, delim);
+		char *eptr;
+		int col_counter = 0;
+		while (tokens != NULL){ // go through columns
+			if (col_counter % cols == col){
+				if (hashmap_contains(map, tokens) == 1){
+					break;
+				} else {
+					hashmap_put(map, tokens, 0);
+					categories++;
+				}
+				}
+			tokens = strtok(NULL, delim);
+			col_counter++;
+			}
+		}
+	hashmap_destroy(map);
+	return categories;
 }
